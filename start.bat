@@ -1,0 +1,4 @@
+@echo OFF
+rd /s /q public/hls
+md public/hls
+ffmpeg -re -y -i "MPEGTS Source" -r:0 30 -g:0 120 -keyint_min:0 120 -force_key_frames:0 expr:gte(t,n_forced*4) -s:0 1920x1080 -c:v:0 h264 -b:v:0 4500k -r:1 30 -g:1 120 -keyint_min:1 120 -force_key_frames:1 expr:gte(t,n_forced*4) -s:1 1280x720 -c:v:1 h264 -b:v:1 2500k -r:2 30 -g:2 120 -keyint_min:2 120 -force_key_frames:2 expr:gte(t,n_forced*4) -s:2 854x480 -c:v:2 h264 -b:v:2 1250k -c:a aac -b:a 128K -map 0:v -map 0:v -map 0:v -map 0:a -map 0:a -map 0:a -hls_segment_filename "public/hls/level-%%v/seg-480p-%%03d.ts" -var_stream_map "v:0,a:0 v:1,a:1 v:2,a:2" -f hls -hls_flags +delete_segments+append_list -hls_list_size 5 -hls_time 4 -hls_segment_filename "public/hls/level-%%v/seg-%%03d.ts" -master_pl_name "master.m3u8" "public/hls/level-%%v/manifest.m3u8"
